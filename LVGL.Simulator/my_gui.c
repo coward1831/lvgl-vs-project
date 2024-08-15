@@ -128,4 +128,5 @@ static void lv_obj_demo2(void)
 
     // 为 btn1 添加事件回调函数
     lv_obj_add_event_cb(btn1, btn_event_cb, LV_EVENT_ALL, NULL);
+    //git 尝试语句
 }
