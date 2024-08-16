@@ -33,100 +33,58 @@
  **********************/
 void my_gui_run(void)
 {
-    lv_obj_demo2();
+    demo_label();
 }
 
 /**********************
  *     静态函数
  **********************/
-static lv_obj_t *bar1;
-static lv_obj_t *label1;
-static int charge_value = 0;
-static lv_timer_t *charge_timer = NULL;
 
-// 定义一个函数来处理定时器事件
-static void charge_timer_cb(lv_timer_t *timer)
+static void slider_event_cb(lv_event_t *e)
 {
-    if (charge_value < 100)
+    lv_obj_t *slider = lv_event_get_target(e);
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t *screen1 = lv_obj_get_parent(slider);
+    lv_obj_t *slider_label = lv_obj_get_child(screen1, 1);
+    lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_RIGHT_MID, 20, 0);
+    if (event_code == LV_EVENT_VALUE_CHANGED)
     {
-        charge_value++;
-        lv_bar_set_value(bar1, charge_value, LV_ANIM_OFF);
-        lv_label_set_text_fmt(label1, "%d", charge_value);
-
-        // 根据进度条的值计算指示器颜色
-        uint8_t red = (uint8_t)(charge_value * 2.55);           // 从 0 到 255
-        uint8_t green = (uint8_t)((100 - charge_value) * 2.55); // 从 255 到 0
-        uint8_t blue = 0;                                       // 固定为 0
-        lv_color_t indicator_color = LV_COLOR_MAKE(red, green, blue);
-        lv_obj_set_style_bg_color(bar1, indicator_color, LV_PART_INDICATOR);
-    }
-    else
-    {
-        lv_timer_del(timer);
-        charge_timer = NULL;
+        lv_label_set_text_fmt(slider_label, "#ff0000 value:# #000000 %d#", lv_slider_get_value(slider));
     }
 }
 
-// 定义一个函数来处理按钮事件
-static void btn_event_cb(lv_event_t *e)
+static void demo_label(void)
 {
-    lv_event_code_t code = lv_event_get_code(e);
+    /*   屏幕   */
+    lv_obj_t *screen1 = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_set_size(screen1, 600, 400);
 
-    if (code == LV_EVENT_PRESSED)
-    {
-        // 按下按钮时，启动定时器
-        if (charge_timer == NULL)
-        {
-            charge_timer = lv_timer_create(charge_timer_cb, 100, NULL);
-        }
-    }
-    else if (code == LV_EVENT_RELEASED)
-    {
-        // 松开按钮时，停止定时器
-        if (charge_timer != NULL)
-        {
-            lv_timer_del(charge_timer);
-            charge_timer = NULL;
-        }
-    }
+    /*   滑动条  */
+    lv_obj_t *slider = lv_slider_create(screen1, NULL);
+    lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, 0);
+    lv_obj_set_size(slider, 100, 20);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    /*   标签  */
+    lv_obj_t *slider_label = lv_label_create(screen1, NULL);
+    lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_RIGHT_MID, 20, 0); // 右对齐
+    lv_label_set_recolor(slider_label, true);                             // 标签颜色变化
+    // 设置标签的背景颜色和文本颜色
+    lv_obj_set_style_bg_color(slider_label, lv_color_hex(0xffffff), LV_STATE_DEFAULT);   // 白色背景
+    lv_obj_set_style_text_color(slider_label, lv_color_hex(0x000000), LV_STATE_DEFAULT); // 黑色文本
+    lv_obj_set_style_bg_opa(slider_label, LV_OPA_COVER, LV_STATE_DEFAULT);               // 如果没有该语句，则会没有显示背景颜色
+    lv_label_set_text_fmt(slider_label, "#ff0000 value:# #000000 %d#", lv_slider_get_value(slider));
+
+    /* 标签案例学习 */
+    lv_obj_t *label1 = lv_label_create(screen1, NULL);
+    lv_obj_align(label1, LV_ALIGN_TOP_MID, 0, 50);
+    lv_obj_set_size(label1, 80, 20);
+    lv_label_set_recolor(label1, true);
+    lv_obj_set_style_text_color(label1, lv_color_hex(0xff0000), LV_STATE_DEFAULT);
+    lv_label_set_text(label1, "hello lvgl, this is a label.");
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_SCROLL_CIRCULAR); // 循环滚动
 }
 
-static void lv_obj_demo2(void)
+static - void lv_obj_demo1(void)
 {
-    // 创建一个覆盖整个屏幕的基础对象 screen1
-    lv_obj_t *screen1 = lv_obj_create(lv_scr_act());
-    // 设置 screen1 的大小为屏幕大小
-    lv_obj_set_size(screen1, LV_HOR_RES, LV_VER_RES);
-
-    // 创建一个进度条对象 bar1，并将其添加到 screen1 上
-    bar1 = lv_bar_create(screen1);
-    // 设置 bar1 的大小为 200x20 像素
-    lv_obj_set_size(bar1, 200, 20);
-    // 将 bar1 对齐到 screen1 的中心
-    lv_obj_set_align(bar1, LV_ALIGN_CENTER);
-    // 设置 bar1 的初始值为 0
-    lv_bar_set_value(bar1, charge_value, LV_ANIM_OFF);
-
-    // 设置 bar1 的样式
-    lv_obj_set_style_bg_color(bar1, lv_color_hex(0xCCCCCC), LV_PART_MAIN);      // 设置背景颜色
-    lv_obj_set_style_bg_color(bar1, lv_color_hex(0x007ACC), LV_PART_INDICATOR); // 设置指示器颜色
-
-    // 创建一个标签对象 label1，并将其添加到 screen1 上
-    label1 = lv_label_create(screen1);
-    // 设置 label1 的文本为当前充电值
-    lv_label_set_text_fmt(label1, "%d", charge_value);
-    // 将 label1 对齐到 bar1 的右边，并偏移 20 像素
-    lv_obj_align(label1, LV_ALIGN_CENTER, 120, 0);
-
-    // 创建一个按钮对象 btn1，并将其添加到 screen1 上
-    lv_obj_t *btn1 = lv_btn_create(screen1);
-    // 设置 btn1 的大小为 100x50 像素
-    lv_obj_set_size(btn1, 100, 50);
-    // 将 btn1 对齐到 screen1 的中心，并偏移 0, 40 像素
-    lv_obj_set_align(btn1, LV_ALIGN_CENTER);
-    lv_obj_set_y(btn1, 40);
-
-    // 为 btn1 添加事件回调函数
-    lv_obj_add_event_cb(btn1, btn_event_cb, LV_EVENT_ALL, NULL);
-    //git 尝试语句
 }

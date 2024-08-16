@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "type_traits": "c",
+        "xtr1common": "c",
+        "xutility": "c",
+        "my_gui.h": "c",
+        "lvgl.h": "c",
+        "mouse.h": "c"
+    }
+}

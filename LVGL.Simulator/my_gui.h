@@ -15,9 +15,6 @@ extern "C"
  *********************/
 #include <stdio.h>
 #include "lvgl/lvgl.h"
-    // #include "lvgl/demos/lv_demos.h"
-    // #include "lvgl/examples/lv_examples.h"
-
     /*********************
      *      define
      *********************/
@@ -38,8 +35,9 @@ extern "C"
     /**********************
      *     静态函数
      **********************/
+    static void demo_label(void);
     static void lv_obj_demo2(void);
-
+    static void lv_obj_demo1(void);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
